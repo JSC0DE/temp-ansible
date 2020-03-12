@@ -18,4 +18,9 @@
   - name: Unpack helm
     unarchive:
       src: /home/siaasadmin/helm-v3.1.1-linux-amd64.tar.gz
+      dest: /home/siaasadmin
+
+  - name: Added Helm to Path
+    copy:
+      src: /home/siaasadmin/linux-amd64/helm
       dest: /usr/bin/helm
