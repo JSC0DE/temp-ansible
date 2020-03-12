@@ -24,3 +24,5 @@
     copy:
       src: /home/siaasadmin/linux-amd64/helm
       dest: /usr/bin/helm
+      mode: 0111
+
