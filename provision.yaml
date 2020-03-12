@@ -8,8 +8,14 @@
     yum: 
       name: git
       state: present
-  - name: Install Helm
+
+  - name: Download Helm
     get_url:
       url: https://get.helm.sh/helm-v3.1.1-linux-amd64.tar.gz
       dest: /home/siaasadmin
       checksum: sha256:cdd7ad304e2615c583dde0ffb0cb38fc1336cd7ce8ff3b5f237434dcadb28c98
+  
+  - name: Unpack helm
+    unarchive:
+      src: /home/siaasadmin/helm-v3.1.1-linux-amd64.tar.gz
+      dest: /usr/bin/helm
