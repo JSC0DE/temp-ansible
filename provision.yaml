@@ -1,0 +1,10 @@
+---
+- name: Provisioning Software
+  hosts: localhost
+  become: true
+
+  tasks:
+  - name: Install git
+  yum: 
+    name: git
+    state: present
