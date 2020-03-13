@@ -12,12 +12,12 @@
         unpacked_path: /tmp/linux-amd64/helm
         execute_path: /usr/bin/helm
         file_mode: 0111
-    rpms:
-      git:
-        package: git2u-all
-        rpm: https://centos7.iuscommunity.org/ius-release.rpm
 
   tasks:
+  - name: Install Git SCL
+    shell:  |
+      yum install rh-git218
+      scl enable rh-git218 bash
 #  - name: Add repositories
 #    yum_repository:
 #      name: "{{ item }}"
