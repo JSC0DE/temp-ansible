@@ -4,25 +4,52 @@
   become: true
 
   tasks:
-  - name: Install git
-    yum: 
-      name: git
-      state: present
 
+# Git Install
+  - name: Core Deps
+    yum: 
+      name: { item }
+      state: present
+    with_items:
+      - curl-devel
+      - expat-devel
+      - gettext-devel
+      - openssl-devel
+      - zlib-devel
+      - gcc
+      - perl-ExtUtils-MakeMaker
+  
+  - name: Download Git
+    get_url:
+      url: https://github.com/git/git/archive/v2.25.1.tar.gz
+      dest: /tmp/git.tar.gz
+
+  - name: Unpack Git
+    unarchive:
+      src: /tmp/git.tar.gz
+      dest: /tmp/git
+
+  - name: Added Git to Path
+    copy:
+      src: /tmp/git
+      dest: /usr/bin/git
+      mode: 0111
+
+# Helm install
   - name: Download Helm
     get_url:
       url: https://get.helm.sh/helm-v3.1.1-linux-amd64.tar.gz
-      dest: /home/siaasadmin
+      dest: /tmp/helm.tar.gz
       checksum: sha256:cdd7ad304e2615c583dde0ffb0cb38fc1336cd7ce8ff3b5f237434dcadb28c98
   
   - name: Unpack helm
     unarchive:
-      src: /home/siaasadmin/helm-v3.1.1-linux-amd64.tar.gz
-      dest: /home/siaasadmin
+      src: /tmp/helm.tar.gz
+      dest: /tmp/helm
 
   - name: Added Helm to Path
     copy:
-      src: /home/siaasadmin/linux-amd64/helm
+      src: /tmp/helm
       dest: /usr/bin/helm
       mode: 0111
 
