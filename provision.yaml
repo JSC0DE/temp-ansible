@@ -1,6 +1,7 @@
 ---
 - name: Provisioning Software
   hosts: localhost
+  gather_facts: no
   become: true
   vars:
     yum:
@@ -14,11 +15,19 @@
     tars:
       git: 
         url: https://github.com/git/git/archive/v2.25.1.tar.gz
-        path: /tmp/git.tar.gz
-        dest: /tmp/git
-        enable: /usr/bin/helm
-        mode: 0111
-  
+        checksum: sha256:aaef0cd609a7730cfbae530d7c91214a941d7e26054d2314cc99794880156b33
+        download_path: /tmp/git.tar.gz
+        unpacked_path: /tmp/git
+        execute_path: /usr/bin/git
+        file_mode: 0111
+      helm:
+        url: https://get.helm.sh/helm-v3.1.1-linux-amd64.tar.gz
+        checksum: sha256:cdd7ad304e2615c583dde0ffb0cb38fc1336cd7ce8ff3b5f237434dcadb28c98
+        download_path: /tmp/helm.tar.gz
+        unpacked_path: /tmp/helm
+        execute_path: /usr/bin/helm
+        file_mode: 0111
+
   tasks:
   - name: Core Deps
     yum: 
@@ -28,36 +37,21 @@
   
   - name: Downloading software tarballs
     get_url:
-      url: "{{ item.url }}"
-      dest: "{{ item.path }}"
+      url: "{{ item.value.url }}"
+      dest: "{{ item.value.download_path }}"
+      checksum: "{{ item.value.checksum}}"
     with_dict: "{{ tars }}"
 
-#  - name: Unpack Git
-#    unarchive:
-#      src: /tmp/git.tar.gz
-#      dest: /tmp/git
-#
-#  - name: Added Git to Path
-#    copy:
-#      src: /tmp/git
-#      dest: /usr/bin/git
-#      mode: 0111
-#
-## Helm install
-#  - name: Download Helm
-#    get_url:
-#      url: https://get.helm.sh/helm-v3.1.1-linux-amd64.tar.gz
-#      dest: /tmp/helm.tar.gz
-#      checksum: sha256:cdd7ad304e2615c583dde0ffb0cb38fc1336cd7ce8ff3b5f237434dcadb28c98
-#  
-#  - name: Unpack helm
-#    unarchive:
-#      src: /tmp/helm.tar.gz
-#      dest: /tmp/helm
-#
-#  - name: Added Helm to Path
-#    copy:
-#      src: /tmp/helm
-#      dest: /usr/bin/helm
-#      mode: 0111
+  - name: Unpacking tarballs
+    unarchive:
+      src: "{{ item.value.download_path }}"
+      dest: /tmp
+    with_dict: "{{ tars }}"
+
+  - name: Moving binaries to path
+    copy:
+      src: "{{ item.value.unpacked_path }}"
+      dest: "{{ item.value.execute_path }}"
+      mode: "{{ item.value.file_mode }}"
+    with_dict: "{{ tars }}"
 
