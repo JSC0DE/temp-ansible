@@ -18,18 +18,18 @@
         rpm: https://centos7.iuscommunity.org/ius-release.rpm
 
   tasks:
-  - name: Add repositories
-    yum_repository:
-      name: "{{ item }}"
-      description: "{{ item.value.package }}"
-      baseurl: "{{ item.value.rpm }}"
-    with_dict: "{{ rpms }}"
-
-  - name: Install RPM packages
-    yum:
-      name: "{{ item.value.package }}"
-      state: present
-    with_dict: "{{ rpms }}"
+#  - name: Add repositories
+#    yum_repository:
+#      name: "{{ item }}"
+#      description: "{{ item.value.package }}"
+#      baseurl: "{{ item.value.rpm }}"
+#    with_dict: "{{ rpms }}"
+#
+#  - name: Install RPM packages
+#    yum:
+#      name: "{{ item.value.package }}"
+#      state: present
+#    with_dict: "{{ rpms }}"
 
   - name: Downloading software tarballs
     get_url:
