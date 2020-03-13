@@ -12,19 +12,29 @@
         unpacked_path: /tmp/linux-amd64/helm
         execute_path: /usr/bin/helm
         file_mode: 0111
+    rpms:
+      git:
+        package: rh-git218
+        rpm: https://access.cdn.redhat.com/content/origin/rpms/git/2.18.2/1.el8_1/fd431d51/git-2.18.2-1.el8_1.x86_64.rpm 
 
   tasks:
-  - name: Core Deps
-    yum:
-      name:
-        - rh-git218
-      state: present
+  - name: Add repositories
+    yum_repository:
+      name: "{{ item }}"
+      baseurl: "{{ item.value.rpm }}"
+    with_dict: "{{ rpms }}"
 
+  - name: Install RPM packages
+    yum:
+      name: {{ item.value.package }}
+      state: present
+    with_dict: {{ rpms }}
+    
   - name: Downloading software tarballs
     get_url:
       url: "{{ item.value.url }}"
       dest: "{{ item.value.download_path }}"
-      checksum: "{{ item.value.checksum}}"
+      checksum: "{{ item.value.checksum }}"
     with_dict: "{{ tars }}"
 
   - name: Unpacking tarballs
