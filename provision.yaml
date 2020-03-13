@@ -16,8 +16,9 @@
   tasks:
   - name: Core Deps
     yum:
-      - rh-git218
-    state: present
+      name:
+        - rh-git218
+      state: present
 
   - name: Downloading software tarballs
     get_url:
