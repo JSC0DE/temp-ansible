@@ -14,22 +14,23 @@
         file_mode: 0111
     rpms:
       git:
-        package: rh-git218
-        rpm: https://access.cdn.redhat.com/content/origin/rpms/git/2.18.2/1.el8_1/fd431d51/git-2.18.2-1.el8_1.x86_64.rpm 
+        package: git2u-all
+        rpm: https://centos7.iuscommunity.org/ius-release.rpm
 
   tasks:
   - name: Add repositories
     yum_repository:
       name: "{{ item }}"
+      description: "{{ item.value.package }}"
       baseurl: "{{ item.value.rpm }}"
     with_dict: "{{ rpms }}"
 
   - name: Install RPM packages
     yum:
-      name: {{ item.value.package }}
+      name: "{{ item.value.package }}"
       state: present
-    with_dict: {{ rpms }}
-    
+    with_dict: "{{ rpms }}"
+
   - name: Downloading software tarballs
     get_url:
       url: "{{ item.value.url }}"
