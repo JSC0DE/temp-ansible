@@ -4,37 +4,21 @@
   gather_facts: no
   become: true
   vars:
-    yum:
-      - curl-devel
-      - expat-devel
-      - gettext-devel
-      - openssl-devel
-      - zlib-devel
-      - gcc
-      - perl-ExtUtils-MakeMaker
     tars:
-      git: 
-        url: https://github.com/git/git/archive/v2.25.1.tar.gz
-        checksum: sha256:aaef0cd609a7730cfbae530d7c91214a941d7e26054d2314cc99794880156b33
-        download_path: /tmp/git.tar.gz
-        unpacked_path: /tmp/git
-        execute_path: /usr/bin/git
-        file_mode: 0111
       helm:
         url: https://get.helm.sh/helm-v3.1.1-linux-amd64.tar.gz
         checksum: sha256:cdd7ad304e2615c583dde0ffb0cb38fc1336cd7ce8ff3b5f237434dcadb28c98
         download_path: /tmp/helm.tar.gz
-        unpacked_path: /tmp/helm
+        unpacked_path: /tmp/linux-amd64/helm
         execute_path: /usr/bin/helm
         file_mode: 0111
 
   tasks:
   - name: Core Deps
-    yum: 
-      name: "{{ item }}"
-      state: present
-    with_items: "{{ yum }}"
-  
+    yum:
+      - rh-git218
+    state: present
+
   - name: Downloading software tarballs
     get_url:
       url: "{{ item.value.url }}"
