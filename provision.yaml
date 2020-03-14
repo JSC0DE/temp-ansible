@@ -27,6 +27,11 @@
       description: "{{ item.value.rpm_name}}"
       baseurl: "{{ item.value.rpm_basepath }}"
     with_dict: "{{ yum }}"
+  
+  - name: Run update
+    rpm_key:
+      key: "{{ item.value.rpm_gpgkey }}"
+    with_dict: "{{ yum }}"
 
   - name: Install RPM packages
     yum:
