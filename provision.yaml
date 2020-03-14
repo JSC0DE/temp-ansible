@@ -12,24 +12,27 @@
         unpacked_path: /tmp/linux-amd64/helm
         execute_path: /usr/bin/helm
         file_mode: 0111
+    yum:
+      git:
+        name: git
+        rpm_name: Wandisco GIT Repository
+        rpm_basepath: http://opensource.wandisco.com/rhel/7/git/$basearch/
+        rpm_gpgkey: http://opensource.wandisco.com/RPM-GPG-KEY-WANdisco
+        
 
   tasks:
-  - name: Install Git SCL
-    shell:  |
-      yum install rh-git218
-      scl enable rh-git218 bash
-#  - name: Add repositories
-#    yum_repository:
-#      name: "{{ item }}"
-#      description: "{{ item.value.package }}"
-#      baseurl: "{{ item.value.rpm }}"
-#    with_dict: "{{ rpms }}"
-#
-#  - name: Install RPM packages
-#    yum:
-#      name: "{{ item.value.package }}"
-#      state: present
-#    with_dict: "{{ rpms }}"
+  - name: Add repositories
+    yum_repository:
+      name: "{{ item.value.rpm_name }}"
+      description: "{{ item.value.rpm_name}}"
+      baseurl: "{{ item.value.rpm_basepath }}"
+    with_dict: "{{ yum }}"
+
+  - name: Install RPM packages
+    yum:
+      name: "{{ item.value.name }}"
+      state: present
+    with_dict: "{{ yum }}"
 
   - name: Downloading software tarballs
     get_url:
