@@ -15,7 +15,7 @@
     yum:
       git:
         name: git
-        rpm_name: Wandisco GIT Repository
+        rpm_name: Wandisco-GIT-Repository
         rpm_basepath: http://opensource.wandisco.com/rhel/7/git/$basearch/
         rpm_gpgkey: http://opensource.wandisco.com/RPM-GPG-KEY-WANdisco
         
