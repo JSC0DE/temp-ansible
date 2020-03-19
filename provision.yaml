@@ -9,8 +9,16 @@
         url: https://get.helm.sh/helm-v3.1.1-linux-amd64.tar.gz
         checksum: sha256:cdd7ad304e2615c583dde0ffb0cb38fc1336cd7ce8ff3b5f237434dcadb28c98
         download_path: /tmp/helm.tar.gz
-        unpacked_path: /tmp/linux-amd64/helm
+        unpacked_path: /tmp
+        pickup_path: /tmp/linux-amd64/helm
         execute_path: /usr/bin/helm
+        file_mode: 0111
+      skaffold:
+        url: https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64
+        checksum: sha256:c00e8dc2c5ebd31b8dad7fb2160a1be2dc1f74585f9c3799782889298e6eca27
+        download_path: /tmp/skaffold
+        pickup_path: /tmp/skaffold
+        execute_path: /usr/bin/skaffold
         file_mode: 0111
     yum:
       git:
@@ -18,17 +26,21 @@
         rpm_name: Wandisco-GIT-Repository
         rpm_basepath: http://opensource.wandisco.com/rhel/7/git/$basearch/
         rpm_gpgkey: http://opensource.wandisco.com/RPM-GPG-KEY-WANdisco
+      docker:
+        name: docker-ce
+        rpm_name: Docker-CE-Stable
+        rpm_basepath: https://download.docker.com/linux/centos/7/$basearch/stable
+        rpm_gpgkey: https://download.docker.com/linux/centos/gpg
         
-
   tasks:
-  - name: Add repositories
+  - name: Add RPM repositories
     yum_repository:
       name: "{{ item.value.rpm_name }}"
       description: "{{ item.value.rpm_name}}"
       baseurl: "{{ item.value.rpm_basepath }}"
     with_dict: "{{ yum }}"
   
-  - name: Run update
+  - name: Add RPM keys
     rpm_key:
       key: "{{ item.value.rpm_gpgkey }}"
     with_dict: "{{ yum }}"
@@ -49,13 +61,30 @@
   - name: Unpacking tarballs
     unarchive:
       src: "{{ item.value.download_path }}"
-      dest: /tmp
+      dest: "{{ item.value.unpacked_path }}"
     with_dict: "{{ tars }}"
+    when: item.value.unpacked_path is defined
 
   - name: Moving binaries to path
     copy:
-      src: "{{ item.value.unpacked_path }}"
+      src: "{{ item.value.pickup_path }}"
       dest: "{{ item.value.execute_path }}"
       mode: "{{ item.value.file_mode }}"
     with_dict: "{{ tars }}"
 
+  - name: Install YUM Deps
+    yum: 
+      name: "{{ item }}"
+      state: present
+    with_items:
+      - yum-utils
+      - device-mapper-persistent-data
+      - lvm2
+      - docker-ce-cli
+      - containerd.io
+
+  - name: Enable Docker Service
+    service:
+      name: docker
+      state: started
+      enabled: yes
