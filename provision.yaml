@@ -91,7 +91,7 @@
 
   - name: Setting docker permissions
     user:
-        name: vagrant
+        name: ci-donkey
         groups: docker 
         append: yes 
         state: present 
